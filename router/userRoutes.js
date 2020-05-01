@@ -2,6 +2,12 @@ const express = require('express')
 const router = express.Router()
 const User = require('../models/user')
 const bcrypt = require('bcryptjs')
+const generateToken = require('../helpers/generate_token')
+const isAuthenticated = require('../Middlewares/auth')
+const hideDetails = require('../helpers/hideDetails')
+
+
+
 
 router.post('/user', async (req, res) => {
 
@@ -19,7 +25,9 @@ router.post('/user', async (req, res) => {
 
         const newUser = await user.save();
 
-        return res.status(201).json(newUser)
+        await generateToken(newUser)
+
+        return res.status(201).send({newUser})
         
     }
     catch (e) {
@@ -42,7 +50,9 @@ router.post('/user/login', async (req, res) => {
         let correctPassword = await bcrypt.compare(password, user.password)
  
         if(correctPassword) {
-            return res.send('Authenticated');
+            let token = await generateToken(user)
+           hideDetails(user)
+            return res.send({user, token});
         }
   
         return res.status(400).send('Password does not match')
@@ -53,14 +63,22 @@ router.post('/user/login', async (req, res) => {
 })
 
 
-router.get('/users', async (req, res) => {
-    try {
-        let users = await User.find({});
-        return res.send(users)
-    }
-    catch (e) {
-        return res.status(500).send(e)
-    }
+router.post('/user/logout', isAuthenticated, async (req, res) => {
+   try {
+       req.user.tokens = await req.user.tokens.filter((tokens) => {
+           return tokens.token !==  req.token;
+       })
+       await req.user.save()
+       return res.send('Logout successful')
+   } catch (error) {
+       res.status(500).send()
+   }
+})
+
+
+router.get('/user/me', isAuthenticated, (req, res) => {
+        return res.send(req.user)
+   
 })
 
 router.get('/user/:id', async (req, res)=> {

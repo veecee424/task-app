@@ -43,8 +43,27 @@ let userSchema = new mongoose.Schema({
                 throw new Error ('Password length must be greater than 6')
             }
         }
-    }
+    },
+
+    tokens: [{
+        token: {
+            type: String
+        }
+    }]
 })
+
+
+/**
+ * Hide sensitive details
+ */
+// userSchema.methods.toJSON = function () {
+//     const user = this
+//     const userObject = user.toObject()
+
+//     delete userObject.password
+//     delete userObject.tokens
+//     return userObject
+// }
 
 const User = mongoose.model('user', userSchema)
 
