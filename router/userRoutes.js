@@ -51,7 +51,7 @@ router.post('/user/login', async (req, res) => {
  
         if(correctPassword) {
             let token = await generateToken(user)
-           hideDetails(user)
+            hideDetails(user)
             return res.send({user, token});
         }
   
@@ -63,44 +63,13 @@ router.post('/user/login', async (req, res) => {
 })
 
 
-router.post('/user/logout', isAuthenticated, async (req, res) => {
-   try {
-       req.user.tokens = await req.user.tokens.filter((tokens) => {
-           return tokens.token !==  req.token;
-       })
-       await req.user.save()
-       return res.send('Logout successful')
-   } catch (error) {
-       res.status(500).send()
-   }
-})
-
-
 router.get('/user/me', isAuthenticated, (req, res) => {
         return res.send(req.user)
    
 })
 
-router.get('/user/:id', async (req, res)=> {
-    let _id = await req.params.id;
 
-    try {
-        let user = await User.findById(_id);
-
-        if(!user) {
-            return res.status(404).send('Unable to find user');
-        } 
-
-        return res.send(user)
-
-    } 
-    catch(e) {
-        return res.status(500).send(e);
-    }
-
-})
-
-router.patch('/user/:id', async (req, res) => {
+router.patch('/user/me', isAuthenticated, async (req, res) => {
     const updateFields = Object.keys(req.body);
     const validFields = ['name', 'password', 'age', 'email']
     const isValidField = updateFields.every((field) => {
@@ -113,26 +82,20 @@ router.patch('/user/:id', async (req, res) => {
 
 
     try {
-        let user = await User.findByIdAndUpdate({_id: req.params.id}, req.body, {new: true, runValidators: true})
-
-        if(!user) {
-            return res.status(404).send()
-        }
-
-        return res.send(user)
+        let user = await User.findByIdAndUpdate({_id: req.user._id}, req.body, {new: true, runValidators: true})
+        hideDetails(user)
+        return res.send({user, 'status': 'Updated successfully'})
     }
     catch (e) {
-        console.log(e)
         return res.status(500).send()
     }
 })
 
-router.delete('/user/:id', async (req, res) => {
+router.delete('/user/me', isAuthenticated, async (req, res) => {
     try {
-        let task = await User.findByIdAndDelete(req.params.id)
-
-        if(!task) {
-            return res.status(404).send('user not found')
+        let deletedUser = await req.user.remove()
+        if(!deletedUser) {
+            throw new Error ('Something went wrong')
         }
         return res.send('Successfully deleted')
     }
@@ -140,5 +103,18 @@ router.delete('/user/:id', async (req, res) => {
         res.status(500).send()
     }
 })
+
+
+router.post('/user/logout', isAuthenticated, async (req, res) => {
+    try {
+        req.user.tokens = await req.user.tokens.filter((tokens) => {
+            return tokens.token !==  req.token;
+        })
+        await req.user.save()
+        return res.send('Logout successful')
+    } catch (error) {
+        res.status(500).send()
+    }
+ })
 
 module.exports = router;
