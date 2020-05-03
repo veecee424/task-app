@@ -1,10 +1,14 @@
 const express = require('express')
 const router = express.Router()
 const Task = require('../models/task')
+const isAuthenticated = require('../Middlewares/auth')
 
 
-router.post('/task', async (req, res) => {
-    let task = new Task(req.body);
+router.post('/task', isAuthenticated, async (req, res) => {
+    let task = new Task({
+        ...req.body,
+        owner: req.user._id
+    });
     try {
         const newTask = await task.save();
         return res.status(201).send(newTask)
@@ -15,23 +19,24 @@ router.post('/task', async (req, res) => {
     }
 })
 
-router.get('/tasks', async (req, res) => {
+router.get('/tasks', isAuthenticated, async (req, res) => {
+    /**Show tasks created only by the authenticated user */
     try {
-        let tasks = await Task.find({});
+        let tasks = await Task.find({owner: req.user._id});
         return res.send(tasks)
-       
     }
     catch (e) {
         return res.status(500).send(e)
     }
 })
 
-router.get('/task/:id', async (req, res) => {
-    let _id = req.params.id
+router.get('/task/:id', isAuthenticated, async (req, res) => {
+    
     try {
-        let task = await Task.findById(_id);
+        let task = await Task.findOne({_id: req.params.id, owner: req.user._id});
+
         if(!task) {
-            return res.status(404).send('Unable to find user')
+            return res.status(404).send('Task not found!')
         }
 
         return res.send(task)
@@ -42,7 +47,7 @@ router.get('/task/:id', async (req, res) => {
     }
 })
 
-router.patch('/task/:id', async (req, res) => {
+router.patch('/task/:id', isAuthenticated, async (req, res) => {
 
     const updateField = Object.keys(req.body);
     const validFields = ['completed', 'description']
@@ -55,7 +60,7 @@ router.patch('/task/:id', async (req, res) => {
     }
 
     try { 
-        let task = await Task.findByIdAndUpdate({_id: req.params.id}, req.body, { new: true, runValidators: true })
+        let task = await Task.findOneAndUpdate({_id: req.params.id, owner: req.user._id}, req.body, { new: true, runValidators: true })
 
         if (!task) {
             return res.status(404).send()
@@ -67,12 +72,12 @@ router.patch('/task/:id', async (req, res) => {
     }
 })
 
-router.delete('/task/:id', async (req, res) => {
+router.delete('/task/:id', isAuthenticated, async (req, res) => {
     try {
-        let task = await Task.findByIdAndDelete(req.params.id);
+        let task = await Task.findOneAndDelete({_id: req.params.id, owner: req.user._id});
 
         if (!task) {
-            return res.status(404).send('Task not found')
+            return res.status(404).send('Unable to perform operation')
         }
 
         return res.send('Successfully deleted')

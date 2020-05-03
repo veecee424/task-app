@@ -53,17 +53,12 @@ let userSchema = new mongoose.Schema({
 })
 
 
-/**
- * Hide sensitive details
- */
-// userSchema.methods.toJSON = function () {
-//     const user = this
-//     const userObject = user.toObject()
+userSchema.virtual('tasks', {
+    ref: 'task',
+    localField: '_id',
+    foreignField: 'owner'
+})
 
-//     delete userObject.password
-//     delete userObject.tokens
-//     return userObject
-// }
 
 const User = mongoose.model('user', userSchema)
 

@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs')
 const generateToken = require('../helpers/generate_token')
 const isAuthenticated = require('../Middlewares/auth')
 const hideDetails = require('../helpers/hideDetails')
+const removeTasks = require('../helpers/removeTask')
 
 
 
@@ -15,10 +16,9 @@ router.post('/user', async (req, res) => {
     let hashedPassword = await bcrypt.hash(req.body.password, salt);
 
     let user = new User({
-         name: req.body.name,
+         ...req.body,
          password: hashedPassword,
-         age: req.body.age,
-         email: req.body.email
+         
         });
    
     try {
@@ -64,6 +64,8 @@ router.post('/user/login', async (req, res) => {
 
 
 router.get('/user/me', isAuthenticated, (req, res) => {
+    
+        hideDetails(req.user)
         return res.send(req.user)
    
 })
@@ -97,6 +99,7 @@ router.delete('/user/me', isAuthenticated, async (req, res) => {
         if(!deletedUser) {
             throw new Error ('Something went wrong')
         }
+        await removeTasks(req.user)
         return res.send('Successfully deleted')
     }
     catch (e) {
