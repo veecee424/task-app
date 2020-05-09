@@ -20,9 +20,22 @@ router.post('/task', isAuthenticated, async (req, res) => {
 })
 
 router.get('/tasks', isAuthenticated, async (req, res) => {
-    /**Show tasks created only by the authenticated user */
+
+    let completeStatus;
+    if (req.query.completed === 'true') {
+         completeStatus = true
+    } else if(req.query.completed === 'false') {
+        completeStatus = false
+    }
+    
     try {
-        let tasks = await Task.find({owner: req.user._id});
+
+        if(req.query.completed === '' || req.query.completed === undefined) {
+            let tasks = await Task.find({owner: req.user._id});
+            return res.send(tasks)
+        } 
+
+        let tasks = await Task.find({owner: req.user._id, completed: completeStatus});
         return res.send(tasks)
     }
     catch (e) {
