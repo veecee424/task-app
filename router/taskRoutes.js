@@ -31,11 +31,11 @@ router.get('/tasks', isAuthenticated, async (req, res) => {
     try {
 
         if(req.query.completed === '' || req.query.completed === undefined) {
-            let tasks = await Task.find({owner: req.user._id});
+            let tasks = await Task.find({owner: req.user._id}).limit(parseInt(req.query.limit)).skip(parseInt(req.query.skip));
             return res.send(tasks)
         } 
 
-        let tasks = await Task.find({owner: req.user._id, completed: completeStatus});
+        let tasks = await Task.find({owner: req.user._id, completed: completeStatus}).limit(parseInt(req.query.limit)).skip(parseInt(req.query.skip));
         return res.send(tasks)
     }
     catch (e) {
