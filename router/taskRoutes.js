@@ -22,20 +22,33 @@ router.post('/task', isAuthenticated, async (req, res) => {
 router.get('/tasks', isAuthenticated, async (req, res) => {
 
     let completeStatus;
-    if (req.query.completed === 'true') {
-         completeStatus = true
-    } else if(req.query.completed === 'false') {
-        completeStatus = false
-    }
+    req.query.completed === 'true' ? completeStatus = true 
+    : (req.query.completed === 'false'  ? completeStatus = false : req.query.completed === undefined)
+
+    let sort = {};
+
+    let key =  req.query.sort.indexOf(':');
+    let sortBy =  req.query.sort.slice(0, key);
+    let sortType =  req.query.sort.slice(key+1); 
+   
+    let sorting;
+    sortType === 'des' ? sorting = -1 : (sortType === 'asc' ? sorting = 1 : sortType === undefined)
+   
+    sort[sortBy] = sorting;
     
     try {
 
-        if(req.query.completed === '' || req.query.completed === undefined) {
-            let tasks = await Task.find({owner: req.user._id});
+        if(req.query.completed === undefined) {
+            let tasks = await Task.find({owner: req.user._id})
+            .limit(parseInt(req.query.limit))
+            .skip(parseInt(req.query.skip))
+            .sort(sort)
             return res.send(tasks)
         } 
 
-        let tasks = await Task.find({owner: req.user._id, completed: completeStatus});
+        let tasks = await Task.find({owner: req.user._id, completed: completeStatus})
+        .limit(parseInt(req.query.limit))
+        .skip(parseInt(req.query.skip));
         return res.send(tasks)
     }
     catch (e) {

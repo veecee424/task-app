@@ -49,7 +49,11 @@ let userSchema = new mongoose.Schema({
         token: {
             type: String
         }
-    }]
+    }],
+    
+    displayPicture: {
+        type: Buffer
+    }
 }, 
     {
         timestamps: true

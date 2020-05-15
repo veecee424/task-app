@@ -38,3 +38,9 @@ It is used thus 'nodemon app.js -e ejs,html,hbs'
  **Promise in javascript simply and basically allows for 'doing one thing after another'
 
  ** Object.keys('Object name') returns an array of all the keys in a provided object
+
+  **limit() and skip() are used for pagination in mongoDB. They both take in a number as an argument specifying how data is returned.
+ For limit, it specifies the number of data (matching a apecified query) that should be returned, while skip takes in a number, specifying
+ the number of data that should be skipped (from first to last) before returning the next.
+
+ **parseInt() is used to convert a string number value to a proper integer
