@@ -6,8 +6,23 @@ const generateToken = require('../helpers/generate_token')
 const isAuthenticated = require('../Middlewares/auth')
 const hideDetails = require('../helpers/hideDetails')
 const removeTasks = require('../helpers/removeTask')
+const multer = require('multer')
 
+let validType = ['JPG', 'JPEG', 'PNG']
 
+const upload = multer({
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+      
+        let isValid = validType.filter((type) => {
+            return file.originalname.toUpperCase().endsWith(type); 
+        })
+        isValid[0] !== undefined ? cb(null, true) : cb(new Error('upload a valid image file'))
+        
+    }
+})
 
 
 router.post('/user', async (req, res) => {
@@ -119,5 +134,21 @@ router.post('/user/logout', isAuthenticated, async (req, res) => {
         res.status(500).send()
     }
  })
+
+
+ router.post('/user/avatar/me', isAuthenticated, upload.single('avatar'), async (req, res) => {
+     req.user.displayPicture = req.file.buffer
+    await req.user.save();
+    res.send('done')
+ }, (error, req, res, next) => {
+     return res.status(400).send({error: error.message})
+ })
+
+ router.delete('/user/avatar/me', isAuthenticated, async (req, res) => {
+    req.user.displayPicture = undefined;
+    await req.user.save()
+    res.send('done');
+ })
+
 
 module.exports = router;
