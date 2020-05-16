@@ -1,4 +1,5 @@
 const express = require('express')
+const sharp = require('sharp')
 const router = express.Router()
 const User = require('../models/user')
 const bcrypt = require('bcryptjs')
@@ -7,6 +8,7 @@ const isAuthenticated = require('../Middlewares/auth')
 const hideDetails = require('../helpers/hideDetails')
 const removeTasks = require('../helpers/removeTask')
 const multer = require('multer')
+
 
 let validType = ['JPG', 'JPEG', 'PNG']
 
@@ -137,7 +139,8 @@ router.post('/user/logout', isAuthenticated, async (req, res) => {
 
 
  router.post('/user/dp/me', isAuthenticated, upload.single('avatar'), async (req, res) => {
-     req.user.displayPicture = req.file.buffer
+    const buffer = await sharp(req.file.buffer).png().resize({width: 200, height: 200}).toBuffer();
+    req.user.displayPicture = buffer;
     await req.user.save();
     res.send('done')
  }, (error, req, res, next) => {
@@ -155,7 +158,7 @@ router.post('/user/logout', isAuthenticated, async (req, res) => {
          let user = await User.findById(req.user._id);
         
          if(user && user.displayPicture) {
-             res.set('Content-Type', 'image/jpeg')
+             res.set('Content-Type', 'image/png')
              return res.send(user.displayPicture)
          }
          
