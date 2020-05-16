@@ -136,7 +136,7 @@ router.post('/user/logout', isAuthenticated, async (req, res) => {
  })
 
 
- router.post('/user/avatar/me', isAuthenticated, upload.single('avatar'), async (req, res) => {
+ router.post('/user/dp/me', isAuthenticated, upload.single('avatar'), async (req, res) => {
      req.user.displayPicture = req.file.buffer
     await req.user.save();
     res.send('done')
@@ -148,6 +148,21 @@ router.post('/user/logout', isAuthenticated, async (req, res) => {
     req.user.displayPicture = undefined;
     await req.user.save()
     res.send('done');
+ })
+
+ router.get('/user/dp/me', isAuthenticated, async (req, res) => {
+     try {
+         let user = await User.findById(req.user._id);
+        
+         if(user && user.displayPicture) {
+             res.set('Content-Type', 'image/jpeg')
+             return res.send(user.displayPicture)
+         }
+         
+         throw new Error('Unable to find user display picture')
+     } catch (e) {
+        res.status(400).send({error: e})
+     }
  })
 
 
