@@ -8,6 +8,7 @@ const isAuthenticated = require('../Middlewares/auth')
 const hideDetails = require('../helpers/hideDetails')
 const removeTasks = require('../helpers/removeTask')
 const upload = require('../config/multer')
+const { sendWelcomeMail, sendCancellationMail } = require('../helpers/mail') 
 
 
 router.post('/user', async (req, res) => {
@@ -25,6 +26,7 @@ router.post('/user', async (req, res) => {
 
         const newUser = await user.save();
         await generateToken(newUser)
+        sendWelcomeMail(user.email, user.name)
         return res.status(201).send({newUser})
         
     }
@@ -96,6 +98,7 @@ router.delete('/user/me', isAuthenticated, async (req, res) => {
         if(!deletedUser) {
             throw new Error ('Something went wrong')
         }
+        sendCancellationMail(req.user.email, req.user.name)
         await removeTasks(req.user)
         return res.send('Successfully deleted')
     }
