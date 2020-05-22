@@ -1,16 +1,17 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
+require('dotenv').config()
 
 const isAuthenticated = async (req, res, next) => {
     
     try {
         let token = await req.header('authToken');
-        let verified = await jwt.verify(token, 'jwtsecret');
+        let verified = await jwt.verify(token, process.env.JWT_SECRET);
         let user = await User.findOne({'_id': verified._id, 'tokens.token': token})
 
         if(user) {
             req.user = user;
-            req.token = token; // This is to ensure the token is made available to the route making a request with the isAuthenticated middleware
+            req.token = token; 
             return next()
         }
 
