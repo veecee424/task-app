@@ -40,7 +40,7 @@ app.use(taskRoutes)
 /**
  * Server listening
 */
-const port = process.env.PORT || 3000;
-app.listen(port, ()=> {
+
+app.listen(process.env.PORT || 3000, ()=> {
     console.log('app running on 3000')
 })
