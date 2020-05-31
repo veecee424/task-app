@@ -38,3 +38,4 @@ It is used thus 'nodemon app.js -e ejs,html,hbs'
  **Promise in javascript simply and basically allows for 'doing one thing after another'
 
  ** Object.keys('Object name') returns an array of all the keys in a provided object
+ ** heroku config:set and heroku config:unset are used to set and unset/remove heroku environment variables
