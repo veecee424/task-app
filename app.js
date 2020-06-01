@@ -33,15 +33,4 @@ app.use(userRoutes)
 const taskRoutes = require('./router/taskRoutes');
 app.use(taskRoutes)
 
-
-    
-
-
-/**
- * Server listening
-*/
-app.listen(process.env.PORT || 3000, ()=> {
-    console.log('app running on 3000')
-})
-
-
+module.exports = app
