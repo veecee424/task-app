@@ -8,9 +8,9 @@ const client = elasticemail.createClient({
 })
 
 
-const sendWelcomeMail = (email, name) => {
+const sendWelcomeMail = async (email, name) => {
     try {
-        client.mailer.send({
+       await client.mailer.send({
             from: 'chatwitval10@gmail.com',
             to: email,
             subject: 'Welcome!',
@@ -20,14 +20,14 @@ const sendWelcomeMail = (email, name) => {
               throw 'Something went wrong, unable to send email';
             }
           });
-    } catch (error) {
-        return error
+    } catch (err) {
+        return err
     }
 }
 
 const sendCancellationMail = async (email, name) => {
     try {
-        client.mailer.send({
+       await client.mailer.send({
             from: 'chatwitval10@gmail.com',
             to: email,
             subject: 'Goodbye!',
@@ -37,8 +37,8 @@ const sendCancellationMail = async (email, name) => {
               throw 'Something went wrong, unable to send email';
             }
           });
-    } catch (error) {
-        return error
+    } catch (err) {
+        return err
     }
 }
 
