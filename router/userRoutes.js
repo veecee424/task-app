@@ -13,20 +13,13 @@ const { sendWelcomeMail, sendCancellationMail } = require('../helpers/mail')
 
 router.post('/user', async (req, res) => {
 
-    let salt = await bcrypt.genSalt(10)
-    let hashedPassword = await bcrypt.hash(req.body.password, salt);
-
-    let user = new User({
-         ...req.body,
-         password: hashedPassword,
-         
-        });
+    let user = new User(req.body);
    
     try {
 
         const newUser = await user.save();
         await generateToken(newUser)
-        sendWelcomeMail(user.email, user.name)
+        // await sendWelcomeMail(user.email, user.name)
         return res.status(201).send({newUser})
         
     }
@@ -52,7 +45,7 @@ router.post('/user/login', async (req, res) => {
         if(correctPassword) {
             let token = await generateToken(user)
             hideDetails(user)
-            return res.send({user, token});
+            return res.status(200).send({user, token});
         }
   
         return res.status(400).send('Password does not match')
