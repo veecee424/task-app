@@ -2,18 +2,23 @@ const request = require('supertest');
 const app = require('../app')
 require('dotenv').config()
 const User = require('../models/user')
-const bcrypt = require('bcryptjs')
+const mongoose = require('mongoose')
+const jwt = require('jsonwebtoken')
 
+
+const userId = new mongoose.Types.ObjectId;
 const userOne = {
+    _id: userId,
     name: 'Veecee',
     password: '123test',
-    email: 'veecee@example.com'
+    email: 'veecee@example.com',
+    tokens: [{
+        token: jwt.sign({'_id': userId}, process.env.JWT_SECRET)
+    }]
 }
 
 beforeEach(async ()=> {
-    /**delete already existing users in the DB */
     await User.deleteMany() 
-    /**Create another one for other routes that require authentication */
     await new User(userOne).save()
 })
 
@@ -47,5 +52,39 @@ test('Should not log in non-existent user', async (done)=> {
         password: 'wrong password'
     })
     .expect(400)
+    done()
+})
+
+test('Should get profile of an authenticated user', async (done) => {
+    await request(app)
+    .get('/user/me')
+    .set('authToken', `${userOne.tokens[0].token}`)
+    .send()
+    .expect(200)
+    done()
+})
+
+test('Should not get profile of an unauthenticated', async (done)=> {
+    await request(app)
+    .get('/user/me')
+    .send()
+    .expect(401)
+    done()
+})
+
+test('Should delete user account', async (done) => {
+    await request(app)
+    .del('/user/me')
+    .set('authToken', `${userOne.tokens[0].token}`)
+    .send()
+    .expect(200)
+    done()
+})
+
+test('Should not delete account for unauthenticated user', async (done) => {
+    await request(app)
+    .del('/user/me')
+    .send()
+    .expect(401)
     done()
 })
