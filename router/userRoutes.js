@@ -91,7 +91,7 @@ router.delete('/user/me', isAuthenticated, async (req, res) => {
         if(!deletedUser) {
             throw new Error ('Something went wrong')
         }
-        sendCancellationMail(req.user.email, req.user.name)
+        // sendCancellationMail(req.user.email, req.user.name)
         await removeTasks(req.user)
         return res.send('Successfully deleted')
     }
