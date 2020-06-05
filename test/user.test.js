@@ -35,7 +35,7 @@ test('Should create a new user', async (done) => {
 })
 
 test('Should log in existing user', async (done) => {
-    await request(app)
+   await request(app)
     .post('/user/login')
     .send({
         password: '123test',
@@ -78,6 +78,8 @@ test('Should delete user account', async (done) => {
     .set('authToken', `${userOne.tokens[0].token}`)
     .send()
     .expect(200)
+    const user = await User.findById(userOne._id)
+    expect(user).toBeNull()
     done()
 })
 
@@ -88,3 +90,5 @@ test('Should not delete account for unauthenticated user', async (done) => {
     .expect(401)
     done()
 })
+
+
