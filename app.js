@@ -35,4 +35,10 @@ app.use(userRoutes)
 const taskRoutes = require('./router/taskRoutes');
 app.use(taskRoutes)
 
-module.exports = app
+require('dotenv').config()
+
+const port = process.env.PORT || 3000;
+
+app.listen(port, ()=> {
+    console.log(`app running on ${port}`)
+})
