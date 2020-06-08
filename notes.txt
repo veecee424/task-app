@@ -39,3 +39,8 @@ It is used thus 'nodemon app.js -e ejs,html,hbs'
 
  ** Object.keys('Object name') returns an array of all the keys in a provided object
  ** heroku config:set and heroku config:unset are used to set and unset/remove heroku environment variables
+
+ **Service Maintenance middleware below
+    app.use((req, res, next) => {
+    res.status(503).send('Maintenance ongoing, check back later')
+    })
