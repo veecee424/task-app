@@ -24,7 +24,7 @@ app.use(bodyParser.json())
 //     res.status(503).send('Maintenance ongoing, check back later')
 //  })
 app.get('/', (req, res) => {
-    res.send('Welcome to my task manager API!')
+    return res.send('Welcome to my task manager API!')
 });
 
 /** 
