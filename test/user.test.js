@@ -17,6 +17,13 @@ const userOne = {
     }]
 }
 
+const userUpdate = {
+    name: 'Veecee',
+    password: '123testUpdate',
+    email: 'veecee@example.com',
+    age: 120
+}
+
 beforeEach(async ()=> {
     await User.deleteMany() 
     await new User(userOne).save()
@@ -91,4 +98,24 @@ test('Should not delete account for unauthenticated user', async (done) => {
     done()
 })
 
+test('Should update valid user fields', async (done)=> {
+    const response = await request(app)
+    .patch('/user/me')
+    .set('authToken', userOne.tokens[0].token)
+    .send(userUpdate)
+    .expect(200)
+    expect(response.body.user.age).toBe(120)
+    done()
+})
+
+test('Should not update invalid fields', async (done) => {
+    await request(app)
+    .patch('/user/me')
+    .set('authToken', userOne.tokens[0].token)
+    .send({
+        location: 'Owerri'
+    })
+    .expect(400)
+    done()
+})
 
