@@ -23,7 +23,9 @@ app.use(bodyParser.json())
 // app.use((req, res, next) => {
 //     res.status(503).send('Maintenance ongoing, check back later')
 //  })
-
+app.get('/', (req, res) => {
+    res.send('Welcome to my task manager API!')
+})
 
 /** 
  * Use routes
