@@ -25,7 +25,7 @@ app.use(bodyParser.json())
 //  })
 app.get('/', (req, res) => {
     res.send('Welcome to my task manager API!')
-})
+});
 
 /** 
  * Use routes
