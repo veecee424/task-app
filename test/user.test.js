@@ -2,20 +2,9 @@ const request = require('supertest');
 const app = require('../app')
 require('dotenv').config()
 const User = require('../models/user')
-const mongoose = require('mongoose')
-const jwt = require('jsonwebtoken')
+const {userId, userOne, setupDatabase} = require('./testdata/testdata')
 
 
-const userId = new mongoose.Types.ObjectId;
-const userOne = {
-    _id: userId,
-    name: 'Veecee',
-    password: '123test',
-    email: 'veecee@example.com',
-    tokens: [{
-        token: jwt.sign({'_id': userId}, process.env.JWT_SECRET)
-    }]
-}
 
 const userUpdate = {
     name: 'Veecee',
@@ -25,8 +14,7 @@ const userUpdate = {
 }
 
 beforeEach(async ()=> {
-    await User.deleteMany() 
-    await new User(userOne).save()
+    await setupDatabase()
 })
 
 
