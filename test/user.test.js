@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../app')
 require('dotenv').config()
 const User = require('../models/user')
-const {userId, userOne, setupDatabase} = require('./testdata/testdata')
+const {userOne, setupDatabase} = require('./testdata/testdata')
 
 
 
