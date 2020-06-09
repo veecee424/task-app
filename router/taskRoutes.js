@@ -26,18 +26,17 @@ router.get('/tasks', isAuthenticated, async (req, res) => {
     : (req.query.completed === 'false'  ? completeStatus = false : req.query.completed === undefined)
 
     let sort = {};
+        if (req.query.sort) {
+            let key =  req.query.sort.indexOf(':');
+            let sortBy =  req.query.sort.slice(0, key);
+            let sortType =  req.query.sort.slice(key+1);
+            let sorting;
+            sortType === 'des' ? sorting = -1 : (sortType === 'asc' ? sorting = 1 : sortType === undefined)
+            sort[sortBy] = sorting;
+        }
 
-    let key =  req.query.sort.indexOf(':');
-    let sortBy =  req.query.sort.slice(0, key);
-    let sortType =  req.query.sort.slice(key+1); 
-   
-    let sorting;
-    sortType === 'des' ? sorting = -1 : (sortType === 'asc' ? sorting = 1 : sortType === undefined)
-   
-    sort[sortBy] = sorting;
-    
     try {
-
+    
         if(req.query.completed === undefined) {
             let tasks = await Task.find({owner: req.user._id})
             .limit(parseInt(req.query.limit))
@@ -52,6 +51,7 @@ router.get('/tasks', isAuthenticated, async (req, res) => {
         return res.send(tasks)
     }
     catch (e) {
+        console.log(e, 'error')
         return res.status(500).send(e)
     }
 })
@@ -109,6 +109,7 @@ router.delete('/task/:id', isAuthenticated, async (req, res) => {
         return res.send('Successfully deleted')
     }
     catch(e) {
+        console.log(e)
         res.status(500).send()
     }
 })
