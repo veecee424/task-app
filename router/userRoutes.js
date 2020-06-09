@@ -19,7 +19,7 @@ router.post('/user', async (req, res) => {
 
         const newUser = await user.save();
         await generateToken(newUser)
-        await sendWelcomeMail(user.email, user.name)
+        // await sendWelcomeMail(user.email, user.name)
         return res.status(201).send({newUser})
         
     }
@@ -91,7 +91,7 @@ router.delete('/user/me', isAuthenticated, async (req, res) => {
         if(!deletedUser) {
             throw new Error ('Something went wrong')
         }
-        sendCancellationMail(req.user.email, req.user.name)
+        // sendCancellationMail(req.user.email, req.user.name)
         await removeTasks(req.user)
         return res.send('Successfully deleted')
     }

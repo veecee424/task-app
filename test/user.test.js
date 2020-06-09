@@ -119,3 +119,12 @@ test('Should not update invalid fields', async (done) => {
     done()
 })
 
+test('Should upload a user profile picture', async (done) => {
+    await request(app)
+    .post('/user/dp/me')
+    .set('authToken', userOne.tokens[0].token)
+    .attach('avatar', './test/fixtures/dptest.JPG')
+    .expect(200)
+    done()
+})
+
