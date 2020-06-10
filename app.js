@@ -12,7 +12,6 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
 
-
 //Use cors
 app.use(cors())
 
@@ -25,6 +24,10 @@ const userRoutes = require('./router/userRoutes')
 app.use(userRoutes)
 const taskRoutes = require('./router/taskRoutes');
 app.use(taskRoutes)
+
+app.use((e, req, res, next)=> {
+    return res.status(400).send(e.errors.password.message)
+})
 
 module.exports = app
 

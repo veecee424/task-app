@@ -11,7 +11,7 @@ const upload = require('../config/multer')
 const { sendWelcomeMail, sendCancellationMail } = require('../helpers/mail') 
 
 
-router.post('/user', async (req, res) => {
+router.post('/user', async (req, res, next) => {
 
     let user = new User(req.body);
    
@@ -24,7 +24,7 @@ router.post('/user', async (req, res) => {
         
     }
     catch (e) {
-        return res.status(400).send(e)
+        next(e)
     }
     
 })
@@ -129,6 +129,7 @@ router.post('/user/logout', isAuthenticated, async (req, res) => {
  }, (error, req, res, next) => {
      return res.status(400).send({error: error.message})
  })
+
 
  router.delete('/user/avatar/me', isAuthenticated, async (req, res) => {
 
