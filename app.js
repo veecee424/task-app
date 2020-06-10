@@ -12,7 +12,6 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
 
-
 //Use cors
 app.use(cors())
 
@@ -26,17 +25,9 @@ app.use(userRoutes)
 const taskRoutes = require('./router/taskRoutes');
 app.use(taskRoutes)
 
+app.use((e, req, res, next)=> {
+    return res.status(400).send(e.errors.password.message)
+})
+
 module.exports = app
 
-<<<<<<< HEAD
-    
-
-
-/**
- * Server listening
-*/
-app.listen(process.env.PORT || 3000, ()=> {
-    console.log('app running on 3000')
-})
-=======
->>>>>>> d99f52340c2684aa4200641d2ce8ebacc1a23049
