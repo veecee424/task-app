@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 const validator = require('validator')
+const bcrypt = require('bcryptjs')
 
 let userSchema = new mongoose.Schema({
     name: {
@@ -65,6 +66,14 @@ userSchema.virtual('tasks', {
     ref: 'task',
     localField: '_id',
     foreignField: 'owner'
+})
+
+userSchema.pre('save', async function(next) {
+    const user =  this;
+    if(user.password && user.isModified('password')) {
+        user.password = await bcrypt.hash(user.password, 8)
+    }
+    next()
 })
 
 
